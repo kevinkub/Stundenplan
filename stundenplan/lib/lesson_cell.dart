@@ -53,44 +53,42 @@ class LessonCell extends StatelessWidget {
                 ),
                 padding: EdgeInsets.only(left: 16, right: 16),
               ),
-              flex: 2,
+              flex: 5,
             ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                      lesson.start.hour.toString().padLeft(2, '0') +
-                          ':' +
-                          lesson.start.minute.toString().padLeft(2, '0') +
-                          ' - ' +
-                          lesson.end.hour.toString().padLeft(2, '0') +
-                          ':' +
-                          lesson.end.minute.toString().padLeft(2, '0'),
-                      style: TextStyle(color: CupertinoColors.inactiveGray)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Visibility(
-                        child: Icon(
-                          CupertinoIcons.check_mark,
-                          color: CupertinoColors.inactiveGray,
-                        ),
-                        visible: lesson.end.isBefore(DateTime.now()),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Text(
+                    lesson.start.hour.toString().padLeft(2, '0') +
+                        ':' +
+                        lesson.start.minute.toString().padLeft(2, '0') +
+                        ' - ' +
+                        lesson.end.hour.toString().padLeft(2, '0') +
+                        ':' +
+                        lesson.end.minute.toString().padLeft(2, '0'),
+                    style: TextStyle(color: CupertinoColors.inactiveGray)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Visibility(
+                      child: Icon(
+                        CupertinoIcons.check_mark,
+                        color: CupertinoColors.inactiveGray,
                       ),
-                      Text(
-                        getDayOfWeek(lesson.start.weekday) + ', ' +
-                        lesson.start.day.toString().padLeft(2, '0') +
-                            '.' +
-                            lesson.start.month.toString().padLeft(2, '0') +
-                            '.',
-                        style: TextStyle(color: CupertinoColors.inactiveGray),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-              flex: 1,
+                      visible: lesson.end.isBefore(DateTime.now()),
+                    ),
+                    Text(
+                      getDayOfWeek(lesson.start.weekday) +
+                          ', ' +
+                          lesson.start.day.toString().padLeft(2, '0') +
+                          '.' +
+                          lesson.start.month.toString().padLeft(2, '0') +
+                          '.',
+                      style: TextStyle(color: CupertinoColors.inactiveGray),
+                    ),
+                  ],
+                )
+              ],
             ),
           ],
         ),
@@ -99,8 +97,7 @@ class LessonCell extends StatelessWidget {
   }
 
   String getDayOfWeek(int weekday) {
-    assert(weekday >= 1 && weekday <=7);
-    return ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"][weekday-1];
+    assert(weekday >= 1 && weekday <= 7);
+    return ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"][weekday - 1];
   }
-
 }

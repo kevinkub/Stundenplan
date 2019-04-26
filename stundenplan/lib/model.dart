@@ -12,6 +12,7 @@ class AppModel extends Model {
   var lessons = new List<Lesson>();
   var _preferences = SharedPreferences.getInstance();
   var _needsAuth = false;
+  var _isInPeekMode = false;
   var lastRefreshText = "Nie";
 
   AppModel() {
@@ -20,11 +21,21 @@ class AppModel extends Model {
     setup();
   }
 
+  void setPeek(String calendarToPeek) async {
+    var preferences = await _preferences;
+    preferences.setString(PreferenceKeys.Peek, calendarToPeek);
+    setup();
+  }
+
   void setToken(String token) async {
     var preferences = await _preferences;
-    preferences.setString(PreferenceKeys.Token, token + "/ifmv417a");
+    preferences.setString(PreferenceKeys.Token, token);
     checkNeedsAuth();
     setup();
+  }
+
+  bool isInPeekMode() {
+    return _isInPeekMode;
   }
 
   void setup() async {
@@ -136,13 +147,28 @@ class AppModel extends Model {
   Future<List<Lesson>> getLessons() async {
     final preferences = await _preferences;
     final token = preferences.getString(PreferenceKeys.Token);
+    final potentialPeek = preferences.getString(PreferenceKeys.Peek);
     if (null != token) {
-      final request = await http.get('https://intranet.fhdw.de/ical/$token');
+      var url = 'https://intranet.fhdw.de/ical/$token';
+      if(null != potentialPeek && potentialPeek.isNotEmpty) {
+        url += '/$potentialPeek';
+        _isInPeekMode = true;
+      } else {
+        _isInPeekMode = false;
+      }
+      final request = await http.get(url);
       final ical = request.body;
       setCache(ical);
       return parseIcal(ical);
     }
     return new List<Lesson>();
+  }
+
+  Future<List<String>> getAvailableCalendars() async {
+    final preferences = await _preferences;
+    final token = preferences.getString(PreferenceKeys.Token);
+    final request = await http.get('https://intranet.fhdw.de/ical/$token/-');
+    return request.body.split("\n");
   }
 
   List<Course> getCourses(List<Lesson> lessons) {
@@ -189,6 +215,7 @@ class AppModel extends Model {
 
 class PreferenceKeys {
   static const Token = "TOKEN";
+  static const Peek = "PEEK";
   static const Cache = "CACHE";
   static const LastUpdate = "LASTUPDATE";
 }
