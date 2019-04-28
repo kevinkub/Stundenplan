@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:stundenplan/model.dart';
 import 'package:stundenplan/screens/course.dart';
 
@@ -29,7 +30,7 @@ class CourseCell extends StatelessWidget {
             ),
             Expanded(
               child: Container(
-                child: Text(course.name),
+                child: PlatformText(course.name),
                 padding: EdgeInsets.only(left: 16, right: 16),
               ),
               flex: 2,
@@ -37,7 +38,7 @@ class CourseCell extends StatelessWidget {
             Expanded(
               child: Container(
                 alignment: Alignment.centerRight,
-                child: Text(
+                child: PlatformText(
                   (course.getProgress() * 100).round().toString() + " %",
                   style: TextStyle(
                     color: CupertinoColors.inactiveGray,
@@ -53,8 +54,7 @@ class CourseCell extends StatelessWidget {
         ),
       ),
       onTap: () {
-        Navigator.push(
-          context,
+        Navigator.of(context, rootNavigator: true).push(
           CupertinoPageRoute(
               builder: (context) => CourseScreen(course: course)),
         );

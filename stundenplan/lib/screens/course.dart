@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:stundenplan/lesson_cell.dart';
 import 'package:stundenplan/model.dart';
 
@@ -11,11 +12,12 @@ class CourseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text("Kursansicht"),
+    return PlatformScaffold(
+      appBar: PlatformAppBar(
+        title: PlatformText("Kursansicht"),
       ),
-      child: SafeArea(
+      body: SafeArea(
+        bottom: false,
         child: Column(
           children: <Widget>[
             Container(
@@ -42,7 +44,7 @@ class CourseScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
+                          PlatformText(
                             course.name,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
@@ -53,7 +55,7 @@ class CourseScreen extends StatelessWidget {
                                       lesson.end.isBefore(DateTime.now()))
                                   .toList()
                                   .length;
-                              return Text(
+                              return PlatformText(
                                 lessonsDone == 1
                                     ? 'Eine Vorlesung absolviert'
                                     : lessonsDone.toString() +
@@ -85,11 +87,11 @@ class CourseScreen extends StatelessWidget {
                   Expanded(
                     child: Column(
                       children: <Widget>[
-                        Text(
+                        PlatformText(
                           "Vorlesungen",
                           style: TextStyle(fontSize: 13),
                         ),
-                        Text(course.lessons.length.toString(),
+                        PlatformText(course.lessons.length.toString(),
                             style: TextStyle(
                                 fontSize: 13,
                                 color: CupertinoColors.inactiveGray))
@@ -99,11 +101,11 @@ class CourseScreen extends StatelessWidget {
                   Expanded(
                     child: Column(
                       children: <Widget>[
-                        Text(
+                        PlatformText(
                           "Demnächst",
                           style: TextStyle(fontSize: 13),
                         ),
-                        Text(getNextLessonInText(),
+                        PlatformText(getNextLessonInPlatformText(),
                             style: TextStyle(
                                 fontSize: 13,
                                 color: CupertinoColors.inactiveGray))
@@ -113,11 +115,11 @@ class CourseScreen extends StatelessWidget {
                   Expanded(
                     child: Column(
                       children: <Widget>[
-                        Text(
+                        PlatformText(
                           "Fortschritt",
                           style: TextStyle(fontSize: 13),
                         ),
-                        Text(
+                        PlatformText(
                             (course.getProgress() * 100).round().toString() +
                                 ' %',
                             style: TextStyle(
@@ -152,7 +154,7 @@ class CourseScreen extends StatelessWidget {
     );
   }
 
-  String getNextLessonInText() {
+  String getNextLessonInPlatformText() {
     final lesson = course.lessons.firstWhere(
         (lesson) => lesson.start.isAfter(DateTime.now()),
         orElse: () => null);

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
@@ -95,6 +97,15 @@ class AppModel extends Model {
     return _needsAuth;
   }
 
+  Future<String> httpGet(String url) async {
+      final httpClient = new HttpClient();
+      httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      final request = await httpClient.getUrl(Uri.parse(url));
+      final response = await request.close();
+      final data = response.transform(utf8.decoder).join();
+      return data;
+  }
+
   List<Lesson> parseIcal(String icalData) {
     var lessons = new List<Lesson>();
     Lesson lesson;
@@ -141,6 +152,7 @@ class AppModel extends Model {
         lessons.add(lesson);
       }
     }
+    lessons.sort((l1, l2) => l1.start.compareTo(l2.start));
     return lessons;
   }
 
@@ -156,8 +168,7 @@ class AppModel extends Model {
       } else {
         _isInPeekMode = false;
       }
-      final request = await http.get(url);
-      final ical = request.body;
+      final ical = await httpGet(url);
       setCache(ical);
       return parseIcal(ical);
     }
@@ -167,8 +178,8 @@ class AppModel extends Model {
   Future<List<String>> getAvailableCalendars() async {
     final preferences = await _preferences;
     final token = preferences.getString(PreferenceKeys.Token);
-    final request = await http.get('https://intranet.fhdw.de/ical/$token/-');
-    return request.body.split("\n");
+    final response = await httpGet('https://intranet.fhdw.de/ical/$token/-');
+    return response.split("\n");
   }
 
   List<Course> getCourses(List<Lesson> lessons) {
@@ -181,8 +192,17 @@ class AppModel extends Model {
       Colors.brown,
       Colors.indigo,
       Colors.purple,
-      Colors.teal
+      Colors.teal,
+      Colors.pink,
+      Colors.deepPurple,
+      Colors.cyan,
+      Colors.lightGreen,
+      Colors.yellow,
+      Colors.deepOrange,
+      Colors.blueGrey,
     ];
+    var availableColors = colors.toList();
+
     var regexp = new RegExp(r"^[A-Z]*$");
     for (var lesson in lessons) {
       var potentialClassNames = lesson.name.split(' ');
@@ -197,11 +217,10 @@ class AppModel extends Model {
           orElse: () => null);
       if (null == course) {
         course = Course(name: className);
-        if (colors.length > 0) {
-          course.color = colors.removeAt(0);
-        } else {
-          course.color = Colors.transparent;
+        if (availableColors.length == 0) {
+          availableColors = colors.toList();
         }
+        course.color = availableColors.removeAt(0);
         courses.add(course);
       }
       lesson.name = lesson.name.replaceFirst(course.name, '').trim();

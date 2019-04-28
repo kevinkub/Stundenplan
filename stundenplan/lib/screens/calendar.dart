@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:stundenplan/lesson_cell.dart';
 import 'package:stundenplan/model.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class CalendarScreen extends StatefulWidget {
   @override
@@ -16,53 +17,69 @@ class _CalendarScreenState extends State<CalendarScreen> {
   var _date = DateTime.now();
   var _month = DateTime.now();
 
+  void goToToday() {
+    setState(() {
+      _date = DateTime.now();
+      _month = DateTime.now();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     assert(_month.month >= 1 && _month.month <= 12);
-    return ScopedModelDescendant<AppModel>(builder: (context, child, model) {
-      return CupertinoTabView(
-        builder: (BuildContext context) {
-          return CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(
-              middle: Text([
-                "Januar",
-                "Februar",
-                "März",
-                "April",
-                "Mai",
-                "Juni",
-                "Juli",
-                "August",
-                "September",
-                "Oktober",
-                "November",
-                "Dezember"
-              ][_month.month - 1]),
-              trailing: CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: Text("Heute"),
-                onPressed: () {
-                  setState(() {
-                    _date = DateTime.now();
-                    _month = DateTime.now();
-                  });
+    return ScopedModelDescendant<AppModel>(
+      builder: (context, child, model) {
+        return PlatformScaffold(
+          appBar: PlatformAppBar(
+            title: PlatformText([
+              "Januar",
+              "Februar",
+              "März",
+              "April",
+              "Mai",
+              "Juni",
+              "Juli",
+              "August",
+              "September",
+              "Oktober",
+              "November",
+              "Dezember"
+            ][_month.month - 1]),
+            trailingActions: <Widget>[
+              PlatformWidget(
+                ios: (context) {
+                  return CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: PlatformText("Heute"),
+                    onPressed: goToToday,
+                  );
+                },
+                android: (context) {
+                  return IconButton(
+                    icon: Icon(Icons.today),
+                    onPressed: goToToday,
+                  );
                 },
               ),
-            ),
-            child: Container(
-              child: SafeArea(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                              width: 0.5,
-                              color: CupertinoColors.lightBackgroundGray),
-                        ),
-                        color: Color.fromRGBO(250, 250, 250, 1),
+            ],
+          ),
+          body: Container(
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                            width: 0.5,
+                            color: CupertinoColors.lightBackgroundGray),
                       ),
+                      color: Color.fromRGBO(250, 250, 250, 1),
+                    ),
+                    alignment: Alignment.center,
+                    child: Container(
+                      constraints: BoxConstraints(maxWidth: 420),
                       child: Card(
                         color: Colors.transparent,
                         elevation: 0,
@@ -125,46 +142,44 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: Builder(
-                        builder: (context) {
-                          final lessons =
-                              getLessonsForDay(model.lessons, _date);
-                          if (lessons.length > 0) {
-                            return ListView.builder(
-                              itemCount: lessons.length,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  padding: EdgeInsets.only(
-                                      left: 16,
-                                      top: index == 0 ? 16 : 0,
-                                      right: 16),
-                                  child: LessonCell(lesson: lessons[index]),
-                                );
-                              },
-                            );
-                          } else {
-                            return Container(
-                              child: Center(
-                                child: SvgPicture.asset(
-                                  'assets/festivities.svg',
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                ),
+                  ),
+                  Expanded(
+                    child: Builder(
+                      builder: (context) {
+                        final lessons = getLessonsForDay(model.lessons, _date);
+                        if (lessons.length > 0) {
+                          return ListView.builder(
+                            itemCount: lessons.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                padding: EdgeInsets.only(
+                                    left: 16,
+                                    top: index == 0 ? 16 : 0,
+                                    right: 16),
+                                child: LessonCell(lesson: lessons[index]),
+                              );
+                            },
+                          );
+                        } else {
+                          return Container(
+                            child: Center(
+                              child: SvgPicture.asset(
+                                'assets/festivities.svg',
+                                width: MediaQuery.of(context).size.width * 0.5,
                               ),
-                            );
-                          }
-                        },
-                      ),
+                            ),
+                          );
+                        }
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          );
-        },
-      );
-    });
+          ),
+        );
+      },
+    );
   }
 
   bool isSameDay(DateTime a, DateTime b) {

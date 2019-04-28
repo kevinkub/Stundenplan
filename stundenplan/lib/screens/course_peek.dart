@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:stundenplan/model.dart';
 
@@ -28,11 +29,11 @@ class _CalendarPeekPickerState extends State<CalendarPeekPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text("Kurs wählen"),
+    return PlatformScaffold(
+      appBar: PlatformAppBar(
+        title: PlatformText("Kursauswahl"),
       ),
-      child: SafeArea(
+      body: SafeArea(
         child: Container(
           child: Column(
             children: <Widget>[
@@ -67,19 +68,37 @@ class _CalendarPeekPickerState extends State<CalendarPeekPicker> {
                             ),
                           ),
                           Expanded(
-                            child: CupertinoTextField(
-                              onChanged: (str) {
-                                setState(() {
-                                  filteredCalendarNames = calendarNames
-                                      .where((name) => name.startsWith(str))
-                                      .toList();
-                                });
+                            child: PlatformWidget(
+                              ios: (context) {
+                                return CupertinoTextField(
+                                  onChanged: (str) {
+                                    setState(() {
+                                      filteredCalendarNames = calendarNames
+                                          .where((name) => name.startsWith(str))
+                                          .toList();
+                                    });
+                                  },
+                                  autofocus: true,
+                                  clearButtonMode:
+                                      OverlayVisibilityMode.editing,
+                                  autocorrect: false,
+                                  style: Styles.searchText,
+                                  cursorColor: Styles.searchCursorColor,
+                                );
                               },
-                              autofocus: true,
-                              clearButtonMode: OverlayVisibilityMode.editing,
-                              autocorrect: false,
-                              style: Styles.searchText,
-                              cursorColor: Styles.searchCursorColor,
+                              android: (context) {
+                                return PlatformTextField(
+                                  autofocus: true,
+                                  autocorrect: false,
+                                  onChanged: (str) {
+                                    setState(() {
+                                      filteredCalendarNames = calendarNames
+                                          .where((name) => name.startsWith(str))
+                                          .toList();
+                                    });
+                                  },
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -105,7 +124,7 @@ class _CalendarPeekPickerState extends State<CalendarPeekPicker> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Text(filteredCalendarNames[index])
+                                PlatformText(filteredCalendarNames[index])
                               ],
                             ),
                             height: 54,

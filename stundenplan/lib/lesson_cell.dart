@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:stundenplan/model.dart';
 import 'package:stundenplan/screens/course.dart';
 
@@ -17,11 +18,12 @@ class LessonCell extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: () {
         if (!clickable) return;
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (context) => CourseScreen(course: lesson.course),
-          ),
+        Navigator.of(context, rootNavigator: true).push(
+          platformPageRoute(
+              builder: (context) => PlatformWidget(
+                    android: (context) => CourseScreen(course: lesson.course),
+                    ios: (context) => CourseScreen(course: lesson.course),
+                  )),
         );
       },
       child: Container(
@@ -34,7 +36,7 @@ class LessonCell extends StatelessWidget {
               width: 60,
               height: 60,
               alignment: Alignment.center,
-              child: Text(
+              child: PlatformText(
                 lesson.course.name,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: Colors.white),
@@ -46,9 +48,10 @@ class LessonCell extends StatelessWidget {
               child: Container(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(lesson.name, overflow: TextOverflow.ellipsis),
-                    Text(lesson.location, overflow: TextOverflow.ellipsis),
+                    PlatformText(lesson.name, overflow: TextOverflow.ellipsis),
+                    PlatformText(lesson.location, overflow: TextOverflow.ellipsis),
                   ],
                 ),
                 padding: EdgeInsets.only(left: 16, right: 16),
@@ -56,9 +59,10 @@ class LessonCell extends StatelessWidget {
               flex: 5,
             ),
             Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text(
+                PlatformText(
                     lesson.start.hour.toString().padLeft(2, '0') +
                         ':' +
                         lesson.start.minute.toString().padLeft(2, '0') +
@@ -77,7 +81,7 @@ class LessonCell extends StatelessWidget {
                       ),
                       visible: lesson.end.isBefore(DateTime.now()),
                     ),
-                    Text(
+                    PlatformText(
                       getDayOfWeek(lesson.start.weekday) +
                           ', ' +
                           lesson.start.day.toString().padLeft(2, '0') +
